@@ -63,6 +63,7 @@ if ($publicUrl) {
         Set-Clipboard -Value $publicUrl
         Write-Host "Public URL copied to clipboard."
     }
+    Start-Process $publicUrl
 } else {
     Write-Host "Public URL not available. If ngrok requires auth, set NGROK_AUTHTOKEN and rerun."
 }
