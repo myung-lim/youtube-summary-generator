@@ -61,9 +61,13 @@ def get_youtube_transcript(url):
     try:
         transcript = _fetch_transcript_with_retry(video_id)
     except (NoTranscriptFound, TranscriptsDisabled) as exc:
-        raise ValueError(
-            "이 영상은 자막을 가져올 수 없습니다. 자막이 있는 다른 영상을 시도해 주세요."
-        ) from exc
+        # Try yt-dlp as a fallback for videos where the transcript API fails.
+        try:
+            transcript = _fetch_transcript_with_ytdlp(video_id)
+        except Exception:
+            raise ValueError(
+                "이 영상은 자막을 가져올 수 없습니다. 자막이 있는 다른 영상을 시도해 주세요."
+            ) from exc
     except Exception as exc:
         logger.exception("Transcript fetch failed. video_id=%s url=%s", video_id, url)
         raise ValueError(
