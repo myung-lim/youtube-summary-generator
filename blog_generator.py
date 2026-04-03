@@ -216,6 +216,10 @@ def _parse_vtt(path):
             line = raw.strip()
             if not line or line.startswith("WEBVTT"):
                 continue
+            if line.lower().startswith("kind:"):
+                continue
+            if line.lower().startswith("language:"):
+                continue
             if "-->" in line:
                 continue
             if re.fullmatch(r"\d+", line):
