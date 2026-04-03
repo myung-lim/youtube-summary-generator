@@ -1,5 +1,14 @@
 # YouTube Blog Generator
 
+![License](https://img.shields.io/github/license/myung-lim/youtube-summary-generator?style=flat-square)
+![Stars](https://img.shields.io/github/stars/myung-lim/youtube-summary-generator?style=flat-square)
+![Issues](https://img.shields.io/github/issues/myung-lim/youtube-summary-generator?style=flat-square)
+
+## 스크린샷
+
+![입력 화면](docs/images/home.png)
+![결과 화면](docs/images/result.png)
+
 YouTube URL을 입력하면 영상 자막을 기반으로 블로그 초안을 생성하는 Flask 애플리케이션입니다.
 
 ## 생성 형식
