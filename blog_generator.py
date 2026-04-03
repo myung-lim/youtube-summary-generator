@@ -69,7 +69,7 @@ def get_youtube_transcript(url):
         ) from exc
 
     text = " ".join(item["text"].strip() for item in transcript if item.get("text"))
-    cleaned = re.sub(r"\s+", " ", text).strip()
+    cleaned = _normalize_transcript(text)
 
     if not cleaned:
         logger.warning("Transcript empty after cleaning. video_id=%s", video_id)
@@ -225,9 +225,48 @@ def _parse_vtt(path):
             if re.fullmatch(r"\d+", line):
                 continue
             line = re.sub(r"<[^>]+>", "", line)
+            line = _strip_meta_phrases(line)
             if line:
                 lines.append(line)
     return [{"text": " ".join(lines)}]
+
+
+def _strip_meta_phrases(text):
+    text = re.sub(r"\[[^\]]+\]", "", text)
+    text = re.sub(r"\([^\)]+\)", "", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _normalize_transcript(text):
+    cleaned = _strip_meta_phrases(text)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    cleaned = re.sub(r"(.)\1{4,}", r"\1\1", cleaned)
+    return cleaned
+
+
+def _log_quality_metrics(blog_post):
+    issues = []
+    for key in ("intro", "body", "conclusion"):
+        section = blog_post.get(key, {})
+        if not section.get("summary"):
+            issues.append(f"{section.get('title', key)}: summary missing")
+        if not section.get("content"):
+            issues.append(f"{section.get('title', key)}: content missing")
+        if not section.get("recommendation"):
+            issues.append(f"{section.get('title', key)}: recommendation missing")
+        if not section.get("incorrect_points"):
+            issues.append(f"{section.get('title', key)}: incorrect_points missing")
+
+    length = sum(
+        len(" ".join(section.get("content", [])))
+        for section in blog_post.values()
+        if isinstance(section, dict)
+    )
+    logger.info(
+        "Blog quality: total_content_chars=%s issues=%s",
+        length,
+        "; ".join(issues) if issues else "none",
+    )
 
 
 def _empty_section(title):

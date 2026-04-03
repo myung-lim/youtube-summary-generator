@@ -1,27 +1,28 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $projectRoot
 
 if (-not (Get-Command py -ErrorAction SilentlyContinue)) {
-    throw "py 명령을 찾을 수 없습니다."
+    throw "py launcher not found"
 }
 
 if (-not $env:OPENAI_API_KEY) {
-    throw "OPENAI_API_KEY 환경 변수가 설정되어 있지 않습니다."
+    throw "OPENAI_API_KEY is not set"
 }
 
 $port = if ($env:PORT) { $env:PORT } else { "5000" }
 $ngrokPath = Join-Path $projectRoot "ngrok.exe"
 
 if (-not (Test-Path $ngrokPath)) {
-    throw "ngrok.exe 파일을 찾을 수 없습니다."
+    throw "ngrok.exe not found"
 }
 
 if ($env:NGROK_AUTHTOKEN) {
     & $ngrokPath config add-authtoken $env:NGROK_AUTHTOKEN | Out-Null
 }
 
+# Start Flask in background
 $pythonArgs = @(
     "-3",
     "-c",
@@ -29,14 +30,39 @@ $pythonArgs = @(
 )
 
 $appProcess = Start-Process -FilePath "py" -ArgumentList $pythonArgs -WorkingDirectory $projectRoot -PassThru
-Start-Sleep -Seconds 3
+Start-Sleep -Seconds 2
 
 if ($appProcess.HasExited) {
-    throw "Flask 서버가 정상적으로 시작되지 않았습니다."
+    throw "Flask server failed to start"
 }
 
-Write-Host "Flask 서버 PID: $($appProcess.Id)"
-Write-Host "로컬 주소: http://127.0.0.1:$port"
-Write-Host "잠시 후 ngrok가 외부 공개 URL을 표시합니다."
+# Start ngrok in background
+$ngrokProcess = Start-Process -FilePath $ngrokPath -ArgumentList "http $port" -WorkingDirectory $projectRoot -PassThru -WindowStyle Hidden
 
-& $ngrokPath http $port
+# Wait for ngrok API
+$publicUrl = $null
+for ($i = 0; $i -lt 20; $i++) {
+    try {
+        $resp = Invoke-RestMethod -Uri http://127.0.0.1:4040/api/tunnels
+        if ($resp.tunnels -and $resp.tunnels.Count -gt 0) {
+            $publicUrl = $resp.tunnels[0].public_url
+            break
+        }
+    } catch {
+        Start-Sleep -Milliseconds 500
+    }
+    Start-Sleep -Milliseconds 500
+}
+
+Write-Host "Flask PID: $($appProcess.Id)"
+Write-Host "ngrok PID: $($ngrokProcess.Id)"
+Write-Host "Local URL: http://127.0.0.1:$port"
+if ($publicUrl) {
+    Write-Host "Public URL: $publicUrl"
+    if (Get-Command Set-Clipboard -ErrorAction SilentlyContinue) {
+        Set-Clipboard -Value $publicUrl
+        Write-Host "Public URL copied to clipboard."
+    }
+} else {
+    Write-Host "Public URL not available. If ngrok requires auth, set NGROK_AUTHTOKEN and rerun."
+}

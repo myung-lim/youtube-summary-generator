@@ -2,7 +2,12 @@ import os
 
 from flask import Flask, jsonify, render_template, request
 
-from blog_generator import generate_blog_post, get_youtube_transcript, save_blog_post_markdown
+from blog_generator import (
+    generate_blog_post,
+    get_youtube_transcript,
+    save_blog_post_markdown,
+    _log_quality_metrics,
+)
 
 
 app = Flask(__name__)
@@ -15,6 +20,7 @@ def index():
         try:
             transcript = get_youtube_transcript(url)
             blog_post = generate_blog_post(transcript)
+            _log_quality_metrics(blog_post)
             saved_path = save_blog_post_markdown(blog_post, url)
             return render_template(
                 "blog_result.html", blog_post=blog_post, url=url, saved_path=saved_path
@@ -36,6 +42,7 @@ def generate():
     try:
         transcript = get_youtube_transcript(url)
         blog_post = generate_blog_post(transcript)
+        _log_quality_metrics(blog_post)
         save_flag = str(payload.get("save", "true")).lower() != "false"
         saved_path = save_blog_post_markdown(blog_post, url) if save_flag else None
         response = dict(blog_post)
