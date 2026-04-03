@@ -9,6 +9,11 @@
 ![입력 화면](docs/images/home.png)
 ![결과 화면](docs/images/result.png)
 
+스크린샷 업데이트 방법:
+1. 앱을 로컬에서 실행합니다.
+2. 입력 화면과 결과 화면을 캡처합니다.
+3. `docs/images/home.png`, `docs/images/result.png`로 저장합니다.
+
 YouTube URL을 입력하면 영상 자막을 기반으로 블로그 초안을 생성하는 Flask 애플리케이션입니다.
 
 ## 생성 형식

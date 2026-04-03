@@ -11,6 +11,11 @@ Generate a blog-style summary from a YouTube URL.
 ![Home](docs/images/home.png)
 ![Result](docs/images/result.png)
 
+To update screenshots:
+1. Run the app locally.
+2. Capture the home page and result page.
+3. Save them as `docs/images/home.png` and `docs/images/result.png`.
+
 ## Quick Start
 
 ```powershell
