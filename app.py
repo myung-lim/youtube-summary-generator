@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, jsonify, render_template, request
+import logging
 
 from blog_generator import (
     generate_blog_post,
@@ -11,6 +12,7 @@ from blog_generator import (
 
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -26,6 +28,7 @@ def index():
                 "blog_result.html", blog_post=blog_post, url=url, saved_path=saved_path
             )
         except Exception as exc:
+            app.logger.exception("Failed to generate blog post. url=%s", url)
             return render_template("home.html", error=str(exc), url=url)
 
     return render_template("home.html")
@@ -50,6 +53,7 @@ def generate():
             response["saved_path"] = saved_path
         return jsonify(response)
     except Exception as exc:
+        app.logger.exception("API generate failed. url=%s", url)
         return jsonify({"error": str(exc)}), 400
 
 

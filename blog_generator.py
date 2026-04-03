@@ -87,6 +87,10 @@ def _get_cookies_path():
     cookies_path = os.getenv("YOUTUBE_COOKIES_PATH", "").strip()
     if cookies_path and os.path.exists(cookies_path):
         return cookies_path
+    # Fallback: use repo cookie file if present (useful on Vercel)
+    default_path = "www.youtube.com_cookies.txt"
+    if os.path.exists(default_path):
+        return default_path
     return None
 
 
