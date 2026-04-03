@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Blog Generator</title>
+    <style>
+        :root {
+            --bg: #f4efe6;
+            --card: rgba(255, 252, 245, 0.9);
+            --ink: #1f2933;
+            --subtle: #52606d;
+            --accent: #aa3a2c;
+            --accent-dark: #7f2b21;
+            --line: rgba(31, 41, 51, 0.12);
+            --shadow: 0 20px 45px rgba(31, 41, 51, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(170, 58, 44, 0.14), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(226, 192, 126, 0.25), transparent 35%),
+                linear-gradient(135deg, #f6f1e7, #f2ebe0 45%, #efe6d8);
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .shell {
+            width: min(860px, 100%);
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            backdrop-filter: blur(14px);
+        }
+
+        .hero {
+            padding: 44px 40px 26px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(170, 58, 44, 0.09);
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        h1 {
+            margin: 18px 0 14px;
+            font-size: clamp(2rem, 5vw, 3.3rem);
+            line-height: 1.1;
+        }
+
+        p {
+            margin: 0;
+            color: var(--subtle);
+            line-height: 1.7;
+            font-size: 1.02rem;
+        }
+
+        .panel {
+            padding: 30px 40px 40px;
+        }
+
+        form {
+            display: grid;
+            gap: 18px;
+        }
+
+        label {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 18px 20px;
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            font-size: 1rem;
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.88);
+        }
+
+        input[type="text"]:focus {
+            outline: 2px solid rgba(170, 58, 44, 0.18);
+            border-color: rgba(170, 58, 44, 0.3);
+        }
+
+        button {
+            border: 0;
+            border-radius: 18px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .hint,
+        .error,
+        .footer {
+            border-radius: 18px;
+            padding: 16px 18px;
+            line-height: 1.6;
+        }
+
+        .hint {
+            background: rgba(82, 96, 109, 0.07);
+            color: var(--subtle);
+        }
+
+        .error {
+            background: rgba(170, 58, 44, 0.09);
+            color: var(--accent-dark);
+        }
+
+        .footer {
+            margin-top: 18px;
+            border: 1px dashed var(--line);
+            color: var(--subtle);
+        }
+
+        @media (max-width: 640px) {
+            .hero,
+            .panel {
+                padding-left: 22px;
+                padding-right: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="hero">
+            <span class="eyebrow">YouTube to Blog</span>
+            <h1>유튜브 URL만 넣으면<br>블로그 초안이 정리됩니다.</h1>
+            <p>영상 자막을 읽어 서론, 본론, 결론 구조로 정리하고, 각 섹션마다 요약, 핵심 내용, 추천 학습 주제, 잘못된 부분까지 한 번에 생성합니다.</p>
+        </section>
+
+        <section class="panel">
+            <form method="post">
+                <div>
+                    <label for="url">YouTube URL</label>
+                    <input
+                        id="url"
+                        type="text"
+                        name="url"
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        value="{{ url or '' }}"
+                        required
+                    >
+                </div>
+                <button type="submit">블로그 글 생성하기</button>
+            </form>
+
+            <div class="hint" style="margin-top: 18px;">
+                자막이 있는 영상일수록 결과 품질이 안정적입니다. 비공개 영상이나 자막이 비활성화된 영상은 처리되지 않을 수 있습니다.
+            </div>
+
+            {% if error %}
+            <div class="error" style="margin-top: 18px;">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <div class="footer">
+                외부 공개가 필요하면 앱을 `0.0.0.0:5000`으로 실행한 뒤 `ngrok http 5000`으로 터널링할 수 있습니다.
+            </div>
+        </section>
+    </main>
+</body>
+</html>

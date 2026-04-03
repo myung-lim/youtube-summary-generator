@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.log
+
+outputs/
+www.youtube.com_cookies.txt
+*.cookies.txt
+
+ngrok.exe
+ngrok.zip
+
+*.env
+.env
+.gitmeta/

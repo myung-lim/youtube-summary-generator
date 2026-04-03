@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>YouTube Blog Generator</title>
+</head>
+<body>
+    <h1>YouTube URL을 입력하세요</h1>
+    <form method="post">
+        <input type="text" name="url" placeholder="YouTube URL" required>
+        <button type="submit">생성</button>
+    </form>
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+</body>
+</html>

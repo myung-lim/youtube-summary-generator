@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ blog_post.title }}</title>
+    <style>
+        :root {
+            --bg: #fcfaf6;
+            --paper: #fffdf8;
+            --ink: #1f2933;
+            --subtle: #52606d;
+            --accent: #b4523b;
+            --accent-soft: rgba(180, 82, 59, 0.11);
+            --line: rgba(31, 41, 51, 0.1);
+            --ok: #2f6b47;
+            --warn: #8a5a14;
+            --shadow: 0 18px 40px rgba(31, 41, 51, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top right, rgba(180, 82, 59, 0.12), transparent 25%),
+                linear-gradient(180deg, #f7f2e8 0%, var(--bg) 24%, #f9f7f2 100%);
+            padding: 28px 18px 42px;
+        }
+
+        .wrap {
+            width: min(980px, 100%);
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .back {
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .source {
+            color: var(--subtle);
+            font-size: 0.95rem;
+        }
+
+        .hero {
+            background: rgba(255, 253, 248, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            padding: 34px 28px;
+            margin-bottom: 22px;
+            backdrop-filter: blur(12px);
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: clamp(2rem, 5vw, 3rem);
+            line-height: 1.15;
+        }
+
+        .lead {
+            margin: 0;
+            color: var(--subtle);
+            line-height: 1.7;
+        }
+
+        .grid {
+            display: grid;
+            gap: 18px;
+        }
+
+        .section-card {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            margin: 0 0 18px;
+            font-size: 1.5rem;
+        }
+
+        .item {
+            padding: 16px 0;
+            border-top: 1px solid var(--line);
+        }
+
+        .item:first-of-type {
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .label {
+            display: inline-block;
+            margin-bottom: 8px;
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: 0.01em;
+        }
+
+        .summary {
+            font-size: 1.06rem;
+            font-weight: 700;
+            line-height: 1.7;
+        }
+
+        .paragraphs {
+            display: grid;
+            gap: 10px;
+            color: var(--ink);
+            line-height: 1.75;
+        }
+
+        .note {
+            padding: 14px 16px;
+            border-radius: 16px;
+            line-height: 1.7;
+        }
+
+        .recommendation {
+            background: rgba(47, 107, 71, 0.08);
+            color: var(--ok);
+        }
+
+        .incorrect {
+            background: rgba(138, 90, 20, 0.08);
+            color: var(--warn);
+        }
+
+        @media (max-width: 640px) {
+            .hero,
+            .section-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="topbar">
+            <a class="back" href="/">새 URL 입력하기</a>
+            <div class="source">{{ url }}</div>
+        </div>
+
+        <section class="hero">
+            <h1>{{ blog_post.title }}</h1>
+            <p class="lead">영상 내용을 블로그 초안 형태로 정리했습니다. 아래 구조는 서론, 본론, 결론 순서이며 각 섹션은 요약, 핵심 내용, 추천 학습 주제, 잘못된 부분 검토로 구성됩니다.</p>
+        </section>
+
+        {% if saved_path %}
+        <section class="section-card" style="margin-bottom: 18px;">
+            <div class="label">Markdown 저장 경로</div>
+            <div class="paragraphs">{{ saved_path }}</div>
+        </section>
+        {% endif %}
+
+        <div class="grid">
+            {% for section in [blog_post.intro, blog_post.body, blog_post.conclusion] %}
+            <section class="section-card">
+                <h2 class="section-title">{{ section.title }}</h2>
+
+                <div class="item">
+                    <div class="label">요약</div>
+                    <div class="summary">{{ section.summary or '생성된 요약이 없습니다.' }}</div>
+                </div>
+
+                <div class="item">
+                    <div class="label">내용</div>
+                    <div class="paragraphs">
+                        {% if section.content %}
+                            {% for paragraph in section.content %}
+                            <div>{{ paragraph }}</div>
+                            {% endfor %}
+                        {% else %}
+                            <div>생성된 본문이 없습니다.</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="label">추천</div>
+                    <div class="note recommendation">{{ section.recommendation or '추가 추천 내용이 없습니다.' }}</div>
+                </div>
+
+                <div class="item">
+                    <div class="label">본내용에서 잘못된 부분</div>
+                    <div class="note incorrect">{{ section.incorrect_points or '없음' }}</div>
+                </div>
+            </section>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
