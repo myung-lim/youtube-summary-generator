@@ -20,7 +20,11 @@ from youtube_transcript_api import YouTubeTranscriptApi
 
 DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-5-mini")
 TRANSCRIPT_LIMIT = 12000
-OUTPUT_DIR = os.getenv("BLOG_OUTPUT_DIR", "outputs")
+_explicit_output_dir = os.getenv("BLOG_OUTPUT_DIR")
+if _explicit_output_dir:
+    OUTPUT_DIR = _explicit_output_dir
+else:
+    OUTPUT_DIR = "/tmp/outputs" if os.getenv("VERCEL") else "outputs"
 
 logger = logging.getLogger(__name__)
 
